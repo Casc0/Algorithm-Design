@@ -8,6 +8,7 @@ public class NodoBinomial {
         this.elem = elem;
     }
 
+
     public NodoBinomial() {
         elem = null;
     }

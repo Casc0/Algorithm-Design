@@ -11,6 +11,10 @@ public class HeapBinomial {
         this.arboles.add(unArbol);
     }
 
+    public HeapBinomial(List<ArbolBinomial> arboles) {
+        this.arboles = arboles;
+    }
+
     public HeapBinomial(){
 
     }
@@ -71,18 +75,18 @@ public class HeapBinomial {
     //Une dos heaps
     public void unir(HeapBinomial heap){
         List<ArbolBinomial> arbolesUnir = heap.arboles;
-
-        //une uno por uno a los arboles del segundo heap
-        while(!arbolesUnir.isEmpty()){
-            ArbolBinomial arbolNuevo = arbolesUnir.remove(0);
-            int ordenNuevo = arbolNuevo.getOrden();
-            unirAux(arbolNuevo, ordenNuevo);
+        if(!arbolesUnir.isEmpty()){
+            //une uno por uno a los arboles del segundo heap
+            while(!arbolesUnir.isEmpty()){
+                ArbolBinomial arbolNuevo = arbolesUnir.remove(0);
+                int ordenNuevo = arbolNuevo.getOrden();
+                unirAux(arbolNuevo, ordenNuevo);
+            }
         }
-
     }
 
     //Añade un arbol a un heap.
-    public void unirAux(ArbolBinomial arbolNuevo, int ordenNuevo){
+    private void unirAux(ArbolBinomial arbolNuevo, int ordenNuevo){
         int posActual = 0;
         boolean fin = false;
         do {
@@ -136,6 +140,76 @@ public class HeapBinomial {
 
         return arbolNuevo;
     }
+
+    //Extrae el minimo elemento del heap. Siempre es una de la raices de uno de los arboles.
+    public Object extraerMin(){
+        Object min = null;
+        if(!arboles.isEmpty()) {
+            int posMin = 0;
+            ArbolBinomial arbolMin = arboles.get(posMin);
+            for (int i = 1; i < this.arboles.size(); i++) {
+                ArbolBinomial arbolActual = arboles.get(i);
+                if (arbolMin.compareTo(arbolActual) < 0) {
+                    arbolMin = arbolActual;
+                }
+            }
+            arboles.remove(posMin);
+            List<ArbolBinomial> nuevaLista = arbolMin.extraerMin();
+            if(!nuevaLista.isEmpty()){
+                HeapBinomial nuevoHeap = new HeapBinomial(nuevaLista);
+                unir(nuevoHeap);
+            }
+        }
+
+        return min;
+    }
+
+    //retorna la posición de la menor raiz de la lista
+    public int buscarMin(){
+        int posMin = -1;
+        if(!arboles.isEmpty()){
+            posMin = 0;
+            ArbolBinomial min = arboles.get(posMin);
+            for(int i = 1; i < this.arboles.size(); i++){
+                ArbolBinomial arbolActual = arboles.get(i);
+                if(min.compareTo(arbolActual) < 0){
+                    min = arbolActual;
+                }
+            }
+        }
+
+        return posMin;
+    }
+
+    public boolean disminuirClave(Comparable x, Comparable valor){
+        boolean disminuido = false;
+        if(!arboles.isEmpty()){
+            ArbolBinomial arbolActual = this.arboles.get(0);
+            while(!disminuido && arbolActual != null){
+                disminuido = arbolActual.disminuir(x);
+            }
+            if(disminuido){
+
+            }
+        }
+        return disminuido;
+    }
+
+    //FALTA
+    public boolean eliminar(Comparable x){
+        boolean eliminado = false;
+        if(!arboles.isEmpty()){
+            ArbolBinomial arbolActual = this.arboles.get(0);
+            while(!eliminado && arbolActual != null){
+                eliminado = arbolActual.eliminar(x);
+            }
+            if(eliminado){
+
+            }
+        }
+        return eliminado;
+    }
+
 
 
 }

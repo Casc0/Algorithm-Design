@@ -68,8 +68,11 @@ public class HeapBinomial {
         return yaExiste;
     }
 
+    //Une dos heaps
     public void unir(HeapBinomial heap){
         List<ArbolBinomial> arbolesUnir = heap.arboles;
+
+        //une uno por uno a los arboles del segundo heap
         while(!arbolesUnir.isEmpty()){
             ArbolBinomial arbolNuevo = arbolesUnir.remove(0);
             int ordenNuevo = arbolNuevo.getOrden();
@@ -78,8 +81,10 @@ public class HeapBinomial {
 
     }
 
+    //Añade un arbol a un heap.
     public void unirAux(ArbolBinomial arbolNuevo, int ordenNuevo){
         int posActual = 0;
+        boolean fin = false;
         do {
             ArbolBinomial arbolActual = arboles.get(posActual);
             int ordenActual = arbolActual.getOrden();
@@ -89,28 +94,47 @@ public class HeapBinomial {
                 //Lo añade donde se repite, empujando al repetido una posicion más atras.
                 arboles.add(posActual, arbolNuevo);
 
-                if(arbolNuevo.compareTo(arbolActual) < 0){
-                    //nuevo es menor que actual, actual se hace hijo de nuevo
-                    arbolNuevo.unir(arbolActual);
-                    arboles.remove(posActual + 1);
-                }else{
-                    //actual es menor que nuevo, nuevo se hace hijo de actual
-                    arbolActual.unir(arbolNuevo);
-                    arboles.remove(posActual);
-                }
+                //une los dos arboles con el mismo orden
+                arbolNuevo = unirArboles(arbolNuevo, arbolActual, posActual);
 
                 //Corrección ante posible repetición
-                ArbolBinomial siguiente = arboles.get(posActual+1);
-
+                arbolActual = arboles.get(posActual+1);
 
                 //Pregunta por el siguiente, ya que podria ser el unico que comparta orden con el nuevo que se creo
-                while(siguiente != null && siguiente.getOrden() == ordenActual){
-
+                while(arbolActual != null && arbolActual.getOrden() == ordenActual){
+                    arbolNuevo = unirArboles(arbolNuevo, arbolActual, posActual);
                 }
 
+                //Corta la ejecución ya que le encontro lugar al arbol
+                fin = true;
+            }else{
+                //itera mientras no encuentre un mismo orden
+                posActual++;
             }
-            posActual++;
-        }while(arboles.get(posActual) != null);
+        }while(arboles.get(posActual) != null && !fin);
+
+        //si no le encontro lugar, es porque su orden es mayor a todos los del heap actual, lo carga al final.
+        if(!fin){
+            arboles.add(posActual, arbolNuevo);
+        }
+    }
+
+    //une dos arboles binomiales
+    private ArbolBinomial unirArboles(ArbolBinomial arbolNuevo, ArbolBinomial arbolActual, int posicion){
+        if(arbolNuevo.compareTo(arbolActual) < 0){
+            //nuevo es menor que actual, actual se hace hijo de nuevo
+            arbolNuevo.unir(arbolActual);
+            arboles.remove(posicion + 1);
+        }else{
+            //actual es menor que nuevo, nuevo se hace hijo de actual
+            arbolActual.unir(arbolNuevo);
+
+            //cambio el puntero a su nuevo padre
+            arbolNuevo =  arbolActual;
+            arboles.remove(posicion + 1);
+        }
+
+        return arbolNuevo;
     }
 
 

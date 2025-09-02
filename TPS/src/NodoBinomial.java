@@ -43,4 +43,8 @@ public class NodoBinomial {
     public void setElem(Comparable elem) {
         this.elem = elem;
     }
+
+    public int compareTo(NodoBinomial otro) {
+        return this.elem.compareTo(otro.elem);
+    }
 }

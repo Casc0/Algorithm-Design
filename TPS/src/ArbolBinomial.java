@@ -79,4 +79,12 @@ public class ArbolBinomial{
         //Se actualiza el orden
         this.orden++;
     }
+
+    public Comparable getElemRaiz(){
+        return this.raiz.getElem();
+    }
+
+    public int compareTo(ArbolBinomial otro) {
+        return this.raiz.compareTo(otro.raiz);
+    }
 }

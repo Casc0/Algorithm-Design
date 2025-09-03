@@ -1,3 +1,5 @@
+package Punto1;
+
 public class NodoBinomial {
     private Comparable elem;
     private NodoBinomial padre, hijo, hermano;

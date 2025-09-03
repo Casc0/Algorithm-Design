@@ -1,3 +1,5 @@
+package Punto1;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -144,19 +146,17 @@ public class HeapBinomial {
     //Extrae el minimo elemento del heap. Siempre es una de la raices de uno de los arboles.
     public Object extraerMin(){
         Object min = null;
-        if(!arboles.isEmpty()) {
-            int posMin = 0;
-            ArbolBinomial arbolMin = arboles.get(posMin);
-            for (int i = 1; i < this.arboles.size(); i++) {
-                ArbolBinomial arbolActual = arboles.get(i);
-                if (arbolMin.compareTo(arbolActual) < 0) {
-                    arbolMin = arbolActual;
-                }
-            }
-            arboles.remove(posMin);
+        int posMin = buscarMin();
+        //si es -1, es porque no el heap esta vacio
+        if(posMin != -1) {
+            //elimina el minimo, y lo guarda
+            ArbolBinomial arbolMin = arboles.remove(posMin);
+            //obtiene todos los hijos como una lista para hacer un heap, ya que todos van a tener orden distinto entre si.
             List<ArbolBinomial> nuevaLista = arbolMin.extraerMin();
+            //si la lista no esta vacia, crea un nuevo heap y lo une al actual
             if(!nuevaLista.isEmpty()){
                 HeapBinomial nuevoHeap = new HeapBinomial(nuevaLista);
+                //une los heaps
                 unir(nuevoHeap);
             }
         }
@@ -170,6 +170,7 @@ public class HeapBinomial {
         if(!arboles.isEmpty()){
             posMin = 0;
             ArbolBinomial min = arboles.get(posMin);
+            //busca la posicion del minimo elemento del heap.
             for(int i = 1; i < this.arboles.size(); i++){
                 ArbolBinomial arbolActual = arboles.get(i);
                 if(min.compareTo(arbolActual) < 0){
@@ -183,13 +184,18 @@ public class HeapBinomial {
 
     public boolean disminuirClave(Comparable x, Comparable valor){
         boolean disminuido = false;
-        if(!arboles.isEmpty()){
-            ArbolBinomial arbolActual = this.arboles.get(0);
+        //solo se puede disminuir si el nuevo valor es menor que el actual
+        if(!arboles.isEmpty() && x.compareTo(valor) > 0){
+            //busca el nodo que contiene x
+            int i = 0;
+            ArbolBinomial arbolActual = this.arboles.get(i);
+            //itera hasta disminuir el nodo o terminar los arboles
             while(!disminuido && arbolActual != null){
-                disminuido = arbolActual.disminuir(x);
-            }
-            if(disminuido){
-
+                disminuido = arbolActual.disminuir(x, valor);
+                if(!disminuido){
+                    i++;
+                    arbolActual = arboles.get(i);
+                }
             }
         }
         return disminuido;
@@ -199,13 +205,28 @@ public class HeapBinomial {
     public boolean eliminar(Comparable x){
         boolean eliminado = false;
         if(!arboles.isEmpty()){
-            ArbolBinomial arbolActual = this.arboles.get(0);
+            //busca y elimina el nodo que contiene x. Retorna la lista
+            int i = 0;
+            ArbolBinomial arbolActual = this.arboles.get(i);
             while(!eliminado && arbolActual != null){
-                eliminado = arbolActual.eliminar(x);
+                List<ArbolBinomial> nuevaLista = arbolActual.eliminar(x);
+                eliminado = nuevaLista != null;
+                if(!eliminado){
+                    i++;
+                    arbolActual = arboles.get(i);
+                }else{
+                    //si lo encontro, elimina el arbol actual
+                    arboles.remove(i);
+                    //si la lista no esta vacia, crea un nuevo heap y lo une al actual
+                    if(!nuevaLista.isEmpty()){
+                        HeapBinomial nuevoHeap = new HeapBinomial(nuevaLista);
+                        unir(nuevoHeap);
+                    }
+                }
             }
-            if(eliminado){
 
-            }
+
+
         }
         return eliminado;
     }

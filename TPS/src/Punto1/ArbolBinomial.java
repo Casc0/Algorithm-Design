@@ -1,3 +1,5 @@
+package Punto1;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,73 +26,86 @@ public class ArbolBinomial{
         this.raiz = raiz;
     }
 
-    public boolean eliminar(Comparable x){
-        boolean eliminar = false;
-
-        if(raiz != null){
-            int comp = raiz.getElem().compareTo(x);
-
-            if(comp > 0){
-                // Si x es mayor a la raiz, se llama recursivamente con los hijos
-                auxPertenece(x, raiz.getHijo());
-
-            }else if(comp == 0){
-                // Si x es igual a la raiz, el elemento pertenece
-                eliminar = true;
-
-                //FALTA BUSCAR MENOR Y REEMPLAZAR EL ELIMINADO
-
+    public List<ArbolBinomial> eliminar(Comparable x) {
+        List<ArbolBinomial> nuevaLista = null;
+        if (raiz != null) {
+            boolean eliminar = disminuir(x, (Comparable) Integer.MIN_VALUE);
+            if(eliminar){
+                nuevaLista = extraerMin();
             }
-            // Si x es menor a la raiz, como es un heap minimo, no va a estar dentro del arbol. Aun hay que buscar en los arboles hermano.
+        }
+        return nuevaLista;
+    }
+
+    public boolean disminuir(Comparable x, Comparable valor){
+        boolean disminuido = false;
+
+        NodoBinomial nodo = this.buscar(valor);
+        if(nodo != null){
+            disminuido = true;
+            //Reemplazo el valor del nodo por el nuevo valor
+            nodo.setElem(valor);
+            NodoBinomial padre = nodo.getPadre();
+
+            //Intercambio los valores mientras el padre sea mayor que el nodo
+            while(padre != null && padre.compareTo(nodo) > 0){
+                Comparable aux = padre.getElem();
+                padre.setElem(nodo.getElem());
+                nodo.setElem(aux);
+                nodo = padre;
+                padre = nodo.getPadre();
+            }
         }
 
-        return eliminar;
+        return disminuido;
     }
 
     public boolean pertenece(Comparable x){
         boolean yaExiste = false;
 
         if(raiz != null){
-            int comp = raiz.getElem().compareTo(x);
-
-            if(comp > 0){
-                // Si x es mayor a la raiz, se llama recursivamente con los hijos
-                auxPertenece(x, raiz.getHijo());
-
-            }else if(comp == 0){
-                // Si x es igual a la raiz, el elemento pertenece
-                yaExiste = true;
-            }
-            // Si x es menor a la raiz, como es un heap minimo, no va a estar dentro del arbol. Aun hay que buscar en los arboles hermano.
+            yaExiste = buscarAux(raiz, x) != null;
         }
 
         return yaExiste;
     }
 
-    private boolean auxPertenece(Comparable x, NodoBinomial nodo){
-        boolean yaExiste = false;
+
+    public NodoBinomial buscar(Comparable x){
+        NodoBinomial nodo = null;
+
+        if(raiz != null){
+            buscarAux(raiz, x);
+        }
+
+        return nodo;
+    }
+
+    private NodoBinomial buscarAux(NodoBinomial nodo, Comparable x){
+        NodoBinomial nodoEncontrado = null;
 
         if(nodo != null){
             int comp = nodo.getElem().compareTo(x);
+
             if(comp == 0){
                 // Si x es igual al nodo, el elemento pertenece
-                yaExiste = true;
-
+                nodoEncontrado = nodo;
 
             }else if(comp > 0){
                 // Si x es mayor al nodo, se llama recursivamente con los hijos
-                yaExiste = auxPertenece(x, nodo.getHijo());
+                nodoEncontrado = buscarAux(nodo.getHijo(), x);
             }
 
-            // Si x es menor al nodo, como es un heap minimo, no va a estar dentro del sub-arbol. Aun hay que buscar en los arboles hermano.
-            if((!yaExiste || comp < 0) && nodo.getHermano() != null){
-                // Si x es menor al nodo o no estaba en los hijos, se llama recursivamente con los hermanos, si es que existen
-                yaExiste = auxPertenece(x, nodo.getHermano());
+            if(nodoEncontrado == null){
+                // Si x es menor al nodo o no lo encontro en los hijos hay que buscar en los arboles hermano.
+                nodoEncontrado = buscarAux(nodo.getHermano(), x);
             }
         }
 
-        return yaExiste;
+        return nodoEncontrado;
     }
+
+
 
     public int getOrden() {
         return orden;
